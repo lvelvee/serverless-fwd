@@ -15,8 +15,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'URL not provided' });
   }
 
-  console.log(url, headers)
-
   if (url.length <= 1) {
     return res.status(400).json({});
   }
@@ -30,11 +28,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const newMethod = (method || "get").toLowerCase()
   const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
 
+  let newHeaders: { [p: string]: string } = {
+    'User-Agent': randomUserAgent,
+  };
+  
+  for (let k in headers) {
+    let key = k.toLowerCase();
+    if (key.startsWith("x-vercel") || key.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded"].includes(key)) {
+      continue;
+    }
+    if (headers[k] !== undefined && headers[k] !== null) {
+      newHeaders[key] = headers[k].toString();
+    }
+  }
+
+  console.log(newUrl, newMethod, newHeaders)
+
   try {
     const response = await fetch(newUrl, {
       method: newMethod,
       headers: {
-        'User-Agent': randomUserAgent,
+        
       },
       body: ["get", "head"].includes(newMethod) ? null : body,
     });
