@@ -29,12 +29,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
 
   let newHeaders: { [p: string]: string } = {
-    'User-Agent': randomUserAgent,
+
   };
   
   for (let k in headers) {
     let key = k.toLowerCase();
-    if (key.startsWith("x-vercel") || key.startsWith("cf-") || key.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded"].includes(key)) {
+    if (key.startsWith("x-vercel") || key.startsWith("cf-") || key.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded", "host"].includes(key)) {
       continue;
     }
     if (headers[k] !== undefined && headers[k] !== null) {
