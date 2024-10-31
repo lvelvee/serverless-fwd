@@ -1,56 +1,44 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 
-const userAgents = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-  // Add more User-Agents as needed
-];
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { url, method, headers, body } = req;
+  const { url, method, headers } = req;
+  const rawBody = await req.read();
 
   if (!url) {
     return res.status(400).json({ error: 'URL not provided' });
   }
 
   if (url.length <= 1) {
-    return res.status(400).json({});
+    return res.status(400).json({ error: 'Invalid URL' });
   }
 
-  const key = "/sk/"
+  const key = "/sk/";
   if (!url.startsWith(key)) {
-    return res.status(400).json({});
+    return res.status(200).json({});
   }
 
   const newUrl = "https://" + url.substring(key.length);
-  const newMethod = (method || "get").toLowerCase()
-  const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
+  const newMethod = (method || "GET").toUpperCase();
 
-  let newHeaders: { [p: string]: string } = {
+  let newHeaders: { [key: string]: string } = {};
 
-  };
-  
   for (let k in headers) {
-    let key = k.toLowerCase();
-    if (key.startsWith("x-vercel") || key.startsWith("cf-") || key.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded", "host"].includes(key)) {
+    const keyLower = k.toLowerCase();
+    if (keyLower.startsWith("x-vercel") || keyLower.startsWith("cf-") || keyLower.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded", "host"].includes(keyLower)) {
       continue;
     }
-    if (headers[k] !== undefined && headers[k] !== null) {
-      newHeaders[key] = headers[k].toString();
+    if (headers[k]) {
+      newHeaders[keyLower] = (headers[k] ?? "").toString();
     }
   }
 
-  console.log(newUrl, newMethod, newHeaders)
+  console.log(newMethod, newUrl, newHeaders, rawBody);
 
   try {
     const response = await fetch(newUrl, {
       method: newMethod,
-      headers: {
-        
-      },
-      body: ["get", "head"].includes(newMethod) ? null : body,
+      headers: newHeaders,
+      body: ["GET", "HEAD"].includes(newMethod) ? null : rawBody,
     });
 
     if (!response.ok) {
@@ -58,7 +46,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const data = await response.text();
+
+    console.log(response.headers)
+
     res.status(response.status).send(data);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while processing the request.' });
