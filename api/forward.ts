@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   
   for (let k in headers) {
     let key = k.toLowerCase();
-    if (key.startsWith("x-vercel") || key.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded"].includes(key)) {
+    if (key.startsWith("x-vercel") || key.startsWith("cf-") || key.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded"].includes(key)) {
       continue;
     }
     if (headers[k] !== undefined && headers[k] !== null) {
