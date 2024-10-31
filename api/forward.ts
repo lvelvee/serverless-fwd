@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({});
   }
 
-  const newUrl =  "https://" + url.substring(key.length);
+  const newUrl = "https://" + url.substring(key.length);
   const newMethod = (method || "get").toLowerCase()
   const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
 
@@ -36,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: {
         'User-Agent': randomUserAgent,
       },
-      body: ["get","head"].includes(newMethod)? null: body,
+      body: ["get", "head"].includes(newMethod) ? null : body,
     });
 
     if (!response.ok) {
