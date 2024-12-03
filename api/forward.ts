@@ -25,8 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (body.headers){
       newHeaders = body.headers
     }
-    if (body.headers){
+    if (body.body){
       newBody = body.body
+    }
+    if (body.json){
+      newBody = JSON.stringify(body.body)
     }
   }
 
