@@ -1,55 +1,38 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { url, method, headers } = req;
-  const rawBody = await req.read();
+  const { url, method } = req.query;
+  const { headers, body } = req.body;
 
-  if (!url) {
+  if (!url || Array.isArray(url)){
     return res.status(400).json({ error: 'URL not provided' });
   }
-
-  if (url.length <= 1) {
-    return res.status(400).json({ error: 'Invalid URL' });
+  if (Array.isArray(method)){
+    return res.status(400).json({ error: 'Method not provided' });
   }
 
-  const key = "/sk/";
-  if (!url.startsWith(key)) {
-    return res.status(200).json({});
-  }
 
-  const newUrl = "https://" + url.substring(key.length);
-  const newMethod = (method || "GET").toUpperCase();
-
-  let newHeaders: { [key: string]: string } = {};
-
-  for (let k in headers) {
-    const keyLower = k.toLowerCase();
-    if (keyLower.startsWith("x-vercel") || keyLower.startsWith("cf-") || keyLower.startsWith("x-forwarded-") || ["content-length", "x-real-ip", "forwarded", "host"].includes(keyLower)) {
-      continue;
-    }
-    if (headers[k]) {
-      newHeaders[keyLower] = (headers[k] ?? "").toString();
-    }
-  }
-
-  console.log(newMethod, newUrl, newHeaders, rawBody);
+  console.log(method, url, headers, body);
 
   try {
-    const response = await fetch(newUrl, {
-      method: newMethod,
-      headers: newHeaders,
-      body: ["GET", "HEAD"].includes(newMethod) ? null : rawBody,
+    const response = await fetch(url, {
+      method: (method || "GET").toUpperCase(),
+      headers: headers || {},
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
       throw new Error(`Request failed with status: ${response.status}`);
     }
 
-    const data = await response.text();
+    const responseData = await response.text();
 
-    console.log(response.headers)
+    res.status(response.status)
+    response.headers.forEach((value, key) => {
+      res.setHeader(key,value)
+    });
 
-    res.status(response.status).send(data);
+    res.send(responseData);
 
   } catch (error) {
     console.error(error);
