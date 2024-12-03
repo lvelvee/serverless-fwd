@@ -39,10 +39,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: newBody,
     });
 
-    if (!response.ok) {
-      throw new Error(`Request failed with status: ${response.status}`);
-    }
-
     const responseData = await response.text();
 
     res.status(response.status)
