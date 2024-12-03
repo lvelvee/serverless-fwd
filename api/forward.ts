@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       newBody = body.body
     }
     if (body.json){
-      newBody = JSON.stringify(body.body)
+      newBody = JSON.stringify(body.json)
     }
   }
 
