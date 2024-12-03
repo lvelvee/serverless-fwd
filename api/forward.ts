@@ -9,18 +9,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (Array.isArray(method)){
     return res.status(400).json({ error: 'Method not provided' });
   }
+  
   const body = req.body;
+
   const newMethod = (method || "GET").toUpperCase()
-  let newBody:string|null = null
+  
+  let newBody:string|null = null;
   
   let newHeaders :{
     [p:string]:string
-  } = body.headers || {}
+  } = {}
 
-  if (body && newMethod!= "GET" && newMethod!= "HEAD"){
-    newBody = JSON.stringify(body)
+
+  if (body ){
+    if (body.headers){
+      newHeaders = body.headers
+    }
+    if (body.headers){
+      newBody = body.body
+    }
   }
-
 
   console.log(newMethod, url, newHeaders, newBody);
 
