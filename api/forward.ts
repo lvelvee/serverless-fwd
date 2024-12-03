@@ -1,8 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { url, method } = req.query;
-  const { headers, body } = req.body;
+  const {url, method} = req.query;
 
   if (!url || Array.isArray(url)){
     return res.status(400).json({ error: 'URL not provided' });
@@ -10,15 +9,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (Array.isArray(method)){
     return res.status(400).json({ error: 'Method not provided' });
   }
+  const body = req.body;
+  const newMethod = (method || "GET").toUpperCase()
+  let newBody:string|null = null
+  
+  let newHeaders :{
+    [p:string]:string
+  } = body.headers || {}
+
+  if (body && newMethod!= "GET" && newMethod!= "HEAD"){
+    newBody = JSON.stringify(body)
+  }
 
 
-  console.log(method, url, headers, body);
+  console.log(newMethod, url, newHeaders, newBody);
 
   try {
     const response = await fetch(url, {
-      method: (method || "GET").toUpperCase(),
-      headers: headers || {},
-      body: JSON.stringify(body),
+      method: newMethod,
+      headers: newHeaders,
+      body: newBody,
     });
 
     if (!response.ok) {
