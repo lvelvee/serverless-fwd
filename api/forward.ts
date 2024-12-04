@@ -42,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: newBody,
     });
 
-    const responseData = await response.blob();
+    const responseData = await response.text();
 
     res.status(response.status)
     response.headers.forEach((value, key) => {
