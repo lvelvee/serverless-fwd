@@ -42,10 +42,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: newBody,
     });
 
-    const responseData = await response.text();
+    const responseData = await response.blob();
 
     res.status(response.status)
     response.headers.forEach((value, key) => {
+
+      if (key.startsWith("content-")){
+        return;
+      }
       res.setHeader(key,value)
     });
 
