@@ -12,12 +12,11 @@
     "outDir": "dist",
     "types": [
       "@cloudflare/workers-types"
-    ],
-    "jsx": "react"
+    ]
   },
   "include": [
     "cloudflare",
     "api",
-    "*.ts"
+    "request.ts"
   ]
 }
