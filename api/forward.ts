@@ -1,5 +1,5 @@
 import {VercelRequest, VercelResponse} from "@vercel/node";
-import {httpRequest} from "../request.js";
+import {httpRequest} from "./request.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 
