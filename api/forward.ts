@@ -1,62 +1,35 @@
-import { VercelRequest, VercelResponse } from "@vercel/node";
+import {VercelRequest, VercelResponse} from "@vercel/node";
+import {httpRequest} from "../request.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const {url, method} = req.query;
 
-  if (!url || Array.isArray(url)){
-    return res.status(400).json({ error: 'URL not provided' });
-  }
-  if (Array.isArray(method)){
-    return res.status(400).json({ error: 'Method not provided' });
-  }
-  
-  const body = req.body;
+    const body = req.body as {
+        url: string;
+        method: string;
+        body: string;
+        headers: { [key: string]: string };
+    };
 
-  const newMethod = (method || "GET").toUpperCase()
-  
-  let newBody:string|null = null;
-  
-  let newHeaders :{
-    [p:string]:string
-  } = {}
+    const {url, method, body: newBody, headers: newHeaders} = body;
 
+    console.log(body);
 
-  if (body ){
-    if (body.headers){
-      newHeaders = body.headers
+    try {
+
+        const {
+            status,
+            headers,
+            body
+        } = await httpRequest({url, method, body: newBody, headers: newHeaders});
+
+        res.status(status)
+        headers && Object.entries(headers).forEach(([key, value]) => {
+            res.setHeader(key, value);
+        })
+        res.send(body);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'An error occurred while processing the request.'});
     }
-    if (body.body){
-      newBody = body.body
-    }
-    if (body.json){
-      newBody = JSON.stringify(body.json)
-    }
-  }
-
-  console.log(newMethod, url, newHeaders, newBody);
-
-  try {
-    const response = await fetch(url, {
-      method: newMethod,
-      headers: newHeaders,
-      body: newBody,
-    });
-
-    const responseData = await response.text();
-
-    res.status(response.status)
-    response.headers.forEach((value, key) => {
-
-      if (key.startsWith("content-")){
-        return;
-      }
-      res.setHeader(key,value)
-    });
-
-    res.send(responseData);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred while processing the request.' });
-  }
 }

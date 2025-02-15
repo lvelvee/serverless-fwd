@@ -13,6 +13,8 @@
     "build": "tsc"
   },
   "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2"
   },
   "resolutions": {},
   "devDependencies": {
@@ -20,7 +22,7 @@
     "@eslint/js": "^9.9.0",
     "@types/eslint": "^9",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.5.0",
+    "@types/node": "^22.13.4",
     "@vercel/functions": "^1.4.2",
     "@vercel/node": "^2.9.6",
     "eslint": "^9.9.0",

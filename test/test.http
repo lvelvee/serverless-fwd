@@ -1,0 +1,11 @@
+POST http://127.0.0.1:3000/api/forward
+content-type: application/json
+
+{
+    "url": "http://httpbin.org/post",
+    "method": "POST",
+    "headers": {
+        "Content-Type": "application/json"
+    },
+    "body": "xxx"
+}
