@@ -10,8 +10,14 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "dist",
-    "types": ["@cloudflare/workers-types"],
+    "types": [
+      "@cloudflare/workers-types"
+    ],
     "jsx": "react"
   },
-  "include": ["cloudflare", "api",],
+  "include": [
+    "cloudflare",
+    "api",
+    "*.ts"
+  ]
 }
